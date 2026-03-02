@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}个人资料 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">个人资料</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label">昵称</label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" value="{{ current_user.nickname or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                    </div>
+
+                    <hr>
+
+                    <h5>修改密码</h5>
+
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">当前密码</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">新密码</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password2" class="form-label">确认新密码</label>
+                        <input type="password" class="form-control" id="new_password2" name="new_password2">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

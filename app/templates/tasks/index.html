@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}任务中心 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>任务中心</h2>
+    <a href="{{ url_for('tasks.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> 创建任务
+    </a>
+</div>
+
+<!-- 统计 -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-warning">{{ stats.pending }}</h3>
+                <p class="text-muted mb-0">待执行</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-primary">{{ stats.running }}</h3>
+                <p class="text-muted mb-0">执行中</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ stats.completed }}</h3>
+                <p class="text-muted mb-0">已完成</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ stats.failed }}</h3>
+                <p class="text-muted mb-0">失败</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if tasks %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>进度</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('tasks.detail', task_id=task.id) }}">{{ task.name }}</a>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ task.task_type }}</span>
+                        </td>
+                        <td>
+                            {% if task.status == 'pending' %}
+                            <span class="badge bg-warning">待执行</span>
+                            {% elif task.status == 'running' %}
+                            <span class="badge bg-primary">执行中</span>
+                            {% elif task.status == 'completed' %}
+                            <span class="badge bg-success">已完成</span>
+                            {% elif task.status == 'failed' %}
+                            <span class="badge bg-danger">失败</span>
+                            {% elif task.status == 'cancelled' %}
+                            <span class="badge bg-secondary">已取消</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.total > 0 %}
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ (task.progress / task.total * 100)|int }}%">
+                                    {{ task.progress }}/{{ task.total }}
+                                </div>
+                            </div>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ task.created_at|time_ago }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('tasks.detail', task_id=task.id) }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if task.status in ['pending', 'running'] %}
+                                <form method="POST" action="{{ url_for('tasks.cancel', task_id=task.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-warning">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if pagination.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('tasks.index', page=pagination.prev_num) }}">上一页</a>
+                </li>
+                {% endif %}
+
+                {% for p in range(1, pagination.pages + 1) %}
+                <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                    <a class="page-link" href="{{ url_for('tasks.index', page=p) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('tasks.index', page=pagination.next_num) }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="text-muted mb-3">
+                <i class="bi bi-clock-history fs-1"></i>
+            </div>
+            <h5>暂无任务</h5>
+            <p class="text-muted">创建您的第一个任务</p>
+            <a href="{{ url_for('tasks.create') }}" class="btn btn-primary">创建任务</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

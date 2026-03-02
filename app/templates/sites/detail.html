@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}{{ site.name }} - 站点详情{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>{{ site.name }}</h2>
+        <p class="text-muted mb-0">{{ site.domain }}</p>
+    </div>
+    <div>
+        <a href="{{ url_for('sites.edit', site_id=site.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> 编辑
+        </a>
+        <form method="POST" action="{{ url_for('sites.delete', site_id=site.id) }}" class="d-inline" onsubmit="return confirm('确定要删除此站点吗?此操作不可恢复')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i> 删除
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 统计 -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">页面数量</h5>
+                <h2>{{ pages_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">文章数量</h5>
+                <h2>{{ articles_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">状态</h5>
+                <span class="badge bg-{{ 'success' if site.status == 'active' else 'secondary' }} fs-6">
+                    {{ site.status }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 站点信息 -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">基本信息</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td class="text-muted">域名:</td>
+                        <td><a href="{{ site.domain }}" target="_blank">{{ site.domain }}</a></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">模板:</td>
+                        <td>{{ site.template }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">输出类型:</td>
+                        <td>{{ site.output_type }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">语言:</td>
+                        <td>{{ site.language }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">创建时间:</td>
+                        <td>{{ site.created_at|format_datetime }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">描述</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ site.description or '暂无描述' }}</p>
+                <hr>
+                <h6>关键词:</h6>
+                {% if site.keywords %}
+                <div>
+                    {% for keyword in site.get_keywords_list() %}
+                    <span class="badge bg-light text-dark">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">暂无关键词</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快速操作 -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <form method="POST" action="{{ url_for('sites.build', site_id=site.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-build"></i> 构建站点
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <form method="POST" action="{{ url_for('sites.generate_sitemap', site_id=site.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-success w-100">
+                                <i class="bi bi-map"></i> 生成sitemap
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('sites.pages', site_id=site.id) }}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-file-earmark-text"></i> 页面管理
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('seo.settings', site_id=site.id) }}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-gear"></i> SEO设置
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}AI配置 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>AI配置 - {{ site.name }}</h2>
+    <a href="{{ url_for('sites/settings', site_id=site.id) }}" class="btn btn-secondary">返回</a>
+</div>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">AI Provider</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="provider" class="form-label">Provider</label>
+                <select class="form-select" id="provider" name="provider">
+                    <option value="openai" {{ 'selected' if ai_config.provider == 'openai' else '' }}>OpenAI</option>
+                    <option value="anthropic" {{ 'selected' if ai_config.provider == 'anthropic' else '' }}>Anthropic</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">OpenAI配置</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="openai_api_key" class="form-label">API Key</label>
+                <input type="password" class="form-control" id="openai_api_key" name="openai_api_key" value="{{ ai_config.openai_api_key or '' }}">
+            </div>
+            <div class="mb-3">
+                <label for="openai_model" class="form-label">模型</label>
+                <input type="text" class="form-control" id="openai_model" name="openai_model" value="{{ ai_config.openai_model or 'gpt-3.5-turbo' }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">内容生成设置</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="default_article_length" class="form-label">默认文章长度</label>
+                    <input type="number" class="form-control" id="default_article_length" name="default_article_length" value="{{ ai_config.default_article_length or 1500 }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="temperature" class="form-label">Temperature</label>
+                    <input type="number" class="form-control" id="temperature" name="temperature" value="{{ ai_config.temperature or 0.7 }}" step="0.1" min="0" max="2">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">保存配置</button>
+</form>
+{% endblock %}

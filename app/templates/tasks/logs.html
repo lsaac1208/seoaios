@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}任务日志 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>任务日志</h2>
+    <a href="{{ url_for('tasks.index') }}" class="btn btn-secondary">返回</a>
+</div>
+
+{% if task %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">任务 #{{ task.id }} - {{ task.name }}</h5>
+    </div>
+    <div class="card-body">
+        {% if task.error_message %}
+        <div class="alert alert-danger">
+            <strong>错误信息:</strong>
+            <pre class="mt-2">{{ task.error_message }}</pre>
+        </div>
+        {% endif %}
+
+        {% if task.result %}
+        <div>
+            <strong>执行结果:</strong>
+            <pre class="mt-2 bg-light p-3">{{ task.result }}</pre>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if failed_tasks %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">最近失败的任务</h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>任务名称</th>
+                    <th>类型</th>
+                    <th>错误信息</th>
+                    <th>时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in failed_tasks %}
+                <tr>
+                    <td><a href="{{ url_for('tasks.detail', task_id=task.id) }}">{{ task.name }}</a></td>
+                    <td>{{ task.task_type }}</td>
+                    <td>{{ task.error_message[:50] }}...</td>
+                    <td>{{ task.updated_at|format_datetime }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

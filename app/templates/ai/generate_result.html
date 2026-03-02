@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}生成结果 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>AI生成结果</h2>
+    <a href="{{ url_for('ai.generate_content') }}" class="btn btn-secondary">返回</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">{{ result.title }}</h5>
+    </div>
+    <div class="card-body">
+        <h6>Meta标题:</h6>
+        <p>{{ result.meta_title }}</p>
+
+        <h6>Meta描述:</h6>
+        <p>{{ result.meta_description }}</p>
+
+        <h6>内容:</h6>
+        <div class="bg-light p-3">
+            {{ result.content|safe }}
+        </div>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('ai.save_article') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="site_id" value="{{ site.id }}">
+    <input type="hidden" name="title" value="{{ result.title }}">
+    <input type="hidden" name="content" value="{{ result.content }}">
+    <input type="hidden" name="meta_title" value="{{ result.meta_title }}">
+    <input type="hidden" name="meta_description" value="{{ result.meta_description }}">
+    <input type="hidden" name="meta_keywords" value="{{ result.meta_keywords }}">
+
+    <button type="submit" class="btn btn-primary">保存为文章</button>
+</form>
+{% endblock %}

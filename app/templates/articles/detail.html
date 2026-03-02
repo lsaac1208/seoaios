@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ article.title }}</h2>
+    <div>
+        <a href="{{ url_for('articles.edit', article_id=article.id) }}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> 编辑
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge bg-{{ 'success' if article.status == 'published' else 'secondary' }}">
+                        {{ article.status }}
+                    </span>
+                    <span class="text-muted ms-2">
+                        浏览: {{ article.views }} | 评论: {{ article.comment_count }}
+                    </span>
+                </div>
+
+                <h3>{{ article.title }}</h3>
+
+                {% if article.excerpt %}
+                <blockquote class="blockquote my-3">
+                    <p>{{ article.excerpt }}</p>
+                </blockquote>
+                {% endif %}
+
+                <div class="article-content">
+                    {{ article.content|safe }}
+                </div>
+
+                <hr>
+
+                <div class="text-muted">
+                    <small>
+                        创建时间: {{ article.created_at|format_datetime }}<br>
+                        更新时间: {{ article.updated_at|format_datetime }}
+                        {% if article.published_at %}
+                        <br>发布时间: {{ article.published_at|format_datetime }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">SEO信息</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Meta标题:</strong> {{ article.meta_title or '-' }}</p>
+                <p><strong>Meta描述:</strong> {{ article.meta_description or '-' }}</p>
+                <p><strong>Meta关键词:</strong> {{ article.meta_keywords or '-' }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">分类标签</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>分类:</strong> {{ article.category.name if article.category else '-' }}</p>
+                <p><strong>标签:</strong></p>
+                {% if article.tags %}
+                <div>
+                    {% for tag in article.get_tags_list() %}
+                    <span class="badge bg-light text-dark">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                -
+                {% endif %}
+            </div>
+        </div>
+
+        {% if article.source_url %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">来源信息</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>来源:</strong> {{ article.source_name or article.source_url }}</p>
+                <p><strong>已改写:</strong> {{ '是' if article.is_rewritten else '否' }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}AI生成内容 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-stars"></i> AI生成内容</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ai.generate_content') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="site_id" class="form-label">目标站点 *</label>
+                        <select class="form-select" id="site_id" name="site_id" required>
+                            <option value="">选择站点</option>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}">{{ site.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="topic" class="form-label">主题 *</label>
+                        <input type="text" class="form-control" id="topic" name="topic" placeholder="输入文章主题" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="keywords" class="form-label">关键词</label>
+                        <input type="text" class="form-control" id="keywords" name="keywords" placeholder="关键词1, 关键词2, 关键词3">
+                        <small class="text-muted">多个关键词用逗号分隔，也可以从下方选择</small>
+
+                        {% if keywords %}
+                        <div class="mt-2">
+                            <small class="text-muted">快速选择:</small>
+                            {% for kw in keywords %}
+                            <span class="badge bg-light text-dark cursor-pointer" onclick="addKeyword('{{ kw.keyword }}')">{{ kw.keyword }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="length" class="form-label">文章长度</label>
+                            <select class="form-select" id="length" name="length">
+                                <option value="500">短篇 (500字)</option>
+                                <option value="1000" selected>中篇 (1000字)</option>
+                                <option value="1500">中长篇 (1500字)</option>
+                                <option value="2000">长篇 (2000字)</option>
+                                <option value="3000">超长篇 (3000字)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="style" class="form-label">写作风格</label>
+                            <select class="form-select" id="style" name="style">
+                                <option value="informative" selected>信息型</option>
+                                <option value="educational">教育型</option>
+                                <option value="persuasive">说服型</option>
+                                <option value="entertaining">娱乐型</option>
+                                <option value="technical">技术型</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-stars"></i> 开始生成
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function addKeyword(keyword) {
+    const input = document.getElementById('keywords');
+    if (input.value) {
+        input.value += ', ' + keyword;
+    } else {
+        input.value = keyword;
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

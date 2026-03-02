@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}编辑文章 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>编辑文章</h2>
+    <div>
+        <a href="{{ url_for('articles.index') }}" class="btn btn-secondary">返回列表</a>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('articles.edit', article_id=article.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="row">
+        <!-- 主要内容 -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">文章内容</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">标题 *</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ article.title }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">内容 *</label>
+                        <textarea class="form-control" id="content" name="content" rows="20" required>{{ article.content }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="excerpt" class="form-label">摘要</label>
+                        <textarea class="form-control" id="excerpt" name="excerpt" rows="3">{{ article.excerpt }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="col-md-4">
+            <!-- 发布设置 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">发布设置</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="site_id" class="form-label">站点</label>
+                        <select class="form-select" id="site_id" name="site_id" required>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}" {{ 'selected' if site.id == article.site_id else '' }}>
+                                {{ site.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">分类</label>
+                        <select class="form-select" id="category_id" name="category_id">
+                            <option value="">选择分类</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}" {{ 'selected' if cat.id == article.category_id else '' }}>
+                                {{ cat.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">标签</label>
+                        <input type="text" class="form-control" id="tags" name="tags" value="{{ article.tags }}" placeholder="标签1, 标签2, 标签3">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">状态</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="draft" {{ 'selected' if article.status == 'draft' else '' }}>草稿</option>
+                            <option value="published" {{ 'selected' if article.status == 'published' else '' }}>已发布</option>
+                            <option value="scheduled" {{ 'selected' if article.status == 'scheduled' else '' }}>定时发布</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="allow_comments" name="allow_comments" {{ 'checked' if article.allow_comments else '' }}>
+                        <label class="form-check-label" for="allow_comments">允许评论</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">保存文章</button>
+                </div>
+            </div>
+
+            <!-- SEO设置 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">SEO设置</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="meta_title" class="form-label">Meta标题</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ article.meta_title or '' }}">
+                        <small class="text-muted">{{ article.meta_title|length if article.meta_title else 0 }}/60</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">Meta描述</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ article.meta_description or '' }}</textarea>
+                        <small class="text-muted">{{ article.meta_description|length if article.meta_description else 0 }}/160</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="meta_keywords" class="form-label">Meta关键词</label>
+                        <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" value="{{ article.meta_keywords or '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 特色图片 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">特色图片</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="featured_image" class="form-label">图片URL</label>
+                        <input type="url" class="form-control" id="featured_image" name="featured_image" value="{{ article.featured_image or '' }}">
+                    </div>
+                    {% if article.featured_image %}
+                    <img src="{{ article.featured_image }}" alt="Featured" class="img-fluid rounded">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic@35.4.1/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#content'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+{% endblock %}

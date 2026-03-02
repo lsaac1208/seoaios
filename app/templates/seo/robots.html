@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Robots.txt - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Robots.txt - {{ site.name }}</h2>
+    <a href="{{ url_for('seo.settings', site_id=site.id) }}" class="btn btn-secondary">返回设置</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Robots.txt 内容</h5>
+    </div>
+    <div class="card-body">
+        <pre class="bg-light p-3">{{ robots_content }}</pre>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}页面管理 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>页面管理 - {{ site.name }}</h2>
+    <a href="{{ url_for('sites.detail', site_id=site.id) }}" class="btn btn-secondary">
+        返回站点
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if pages %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>别名</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>排序</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in pages %}
+                    <tr>
+                        <td>{{ page.title }}</td>
+                        <td><small class="text-muted">{{ page.slug or '-' }}</small></td>
+                        <td>{{ page.page_type }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if page.status == 'published' else 'secondary' }}">
+                                {{ page.status }}
+                            </span>
+                        </td>
+                        <td>{{ page.order }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">编辑</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">暂无页面</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

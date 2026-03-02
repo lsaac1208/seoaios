@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}SEO仪表盘 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>SEO仪表盘</h2>
+    <form method="GET" class="d-flex">
+        <select class="form-select" name="site_id" onchange="this.form.submit()">
+            <option value="">选择站点</option>
+            {% for site in sites %}
+            <option value="{{ site.id }}" {{ 'selected' if site.id == current_site.id else '' }}>
+                {{ site.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if current_site %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ articles_count }}</h3>
+                <p class="text-muted mb-0">文章数</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ pages_count }}</h3>
+                <p class="text-muted mb-0">页面数</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ keywords|length }}</h3>
+                <p class="text-muted mb-0">关键词数</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <a href="{{ url_for('seo.analyze_site', site_id=current_site.id) }}" class="btn btn-primary">
+                    开始分析
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

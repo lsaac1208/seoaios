@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}改写结果 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>AI改写结果</h2>
+    <a href="{{ url_for('ai.rewrite_content') }}" class="btn btn-secondary">返回</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">原文</h5>
+            </div>
+            <div class="card-body">
+                <pre>{{ original_content }}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">改写后</h5>
+            </div>
+            <div class="card-body">
+                <pre>{{ result }}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

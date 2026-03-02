@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}站点管理 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>站点管理</h2>
+    <a href="{{ url_for('sites.new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> 新建站点
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if sites %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>站点名称</th>
+                        <th>域名</th>
+                        <th>模板</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for site in sites %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('sites.detail', site_id=site.id) }}">{{ site.name }}</a>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ site.domain }}</small>
+                        </td>
+                        <td>{{ site.template }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if site.status == 'active' else 'secondary' }}">
+                                {{ site.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ site.created_at|format_datetime }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('sites.detail', site_id=site.id) }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('sites.edit', site_id=site.id) }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if pagination.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('sites.index', page=pagination.prev_num) }}">上一页</a>
+                </li>
+                {% endif %}
+
+                {% for p in range(1, pagination.pages + 1) %}
+                <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                    <a class="page-link" href="{{ url_for('sites.index', page=p) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('sites.index', page=pagination.next_num) }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="text-muted mb-3">
+                <i class="bi bi-globe fs-1"></i>
+            </div>
+            <h5>暂无站点</h5>
+            <p class="text-muted">创建您的第一个站点开始SEO之旅</p>
+            <a href="{{ url_for('sites.new') }}" class="btn btn-primary">新建站点</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

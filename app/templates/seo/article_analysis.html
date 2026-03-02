@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}SEO分析 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>文章SEO分析</h2>
+    <a href="{{ url_for('articles.edit', article_id=article.id) }}" class="btn btn-secondary">返回文章</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">{{ article.title }}</h5>
+    </div>
+    <div class="card-body">
+        <h4>SEO得分: {{ result.score }}/100</h4>
+
+        <div class="progress mb-4" style="height: 20px;">
+            <div class="progress-bar bg-{{ 'success' if result.score >= 80 else 'warning' if result.score >= 60 else 'danger' }}"
+                 role="progressbar" style="width: {{ result.score }}%">
+                {{ result.score }}%
+            </div>
+        </div>
+
+        {% if result.issues %}
+        <div class="alert alert-warning">
+            <h5>问题:</h5>
+            <ul>
+                {% for issue in result.issues %}
+                <li>{{ issue }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if result.suggestions %}
+        <div class="alert alert-info">
+            <h5>建议:</h5>
+            <ul>
+                {% for suggestion in result.suggestions %}
+                <li>{{ suggestion }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

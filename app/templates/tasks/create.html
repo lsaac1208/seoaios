@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}创建任务 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">创建任务</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('tasks.create') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">任务名称 *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="task_type" class="form-label">任务类型 *</label>
+                        <select class="form-select" id="task_type" name="task_type" required>
+                            <option value="crawl">内容抓取</option>
+                            <option value="generate">内容生成</option>
+                            <option value="publish">发布任务</option>
+                            <option value="analyze">SEO分析</option>
+                            <option value="backup">数据备份</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_id" class="form-label">关联站点</label>
+                        <select class="form-select" id="site_id" name="site_id">
+                            <option value="">不关联</option>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}">{{ site.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="crawl_url" class="form-label">抓取URL (仅爬取任务)</label>
+                        <input type="url" class="form-control" id="crawl_url" name="crawl_url" placeholder="https://example.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="schedule" class="form-label">定时执行 (Cron表达式)</label>
+                        <input type="text" class="form-control" id="schedule" name="schedule" placeholder="0 0 * * * (每天凌晨)">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('tasks.index') }}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">创建</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

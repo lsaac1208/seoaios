@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}内容抓取 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-globe"></i> 内容抓取</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ai.crawl') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="url" class="form-label">要抓取的URL *</label>
+                        <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com/article" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_id" class="form-label">目标站点</label>
+                        <select class="form-select" id="site_id" name="site_id">
+                            <option value="">选择站点（可选）</option>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}">{{ site.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">选择站点后可自动将抓取内容保存并改写为文章</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="max_depth" class="form-label">抓取深度</label>
+                        <input type="number" class="form-control" id="max_depth" name="max_depth" value="2" min="1" max="5">
+                        <small class="text-muted">1-5层，越深越慢</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-download"></i> 开始抓取
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">使用说明</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>输入要抓取的网页URL</li>
+                    <li>选择目标站点（可选），系统会自动将抓取的内容保存为草稿</li>
+                    <li>设置抓取深度，1层只抓取当前页面，2层会抓取页面内的链接</li>
+                    <li>抓取完成后可以查看结果或进行AI改写</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

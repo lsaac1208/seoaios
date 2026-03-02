@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}关键词管理 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>关键词管理</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addKeywordModal">
+        <i class="bi bi-plus-lg"></i> 添加关键词
+    </button>
+</div>
+
+<!-- 筛选 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <select class="form-select" name="site_id">
+                    <option value="">全部站点</option>
+                    {% for site in sites %}
+                    <option value="{{ site.id }}" {{ 'selected' if site.id == current_site_id else '' }}>
+                        {{ site.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">筛选</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if keywords %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>关键词</th>
+                        <th>搜索量</th>
+                        <th>难度</th>
+                        <th>当前排名</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for keyword in keywords %}
+                    <tr>
+                        <td>
+                            <strong>{{ keyword.keyword }}</strong>
+                        </td>
+                        <td>
+                            {% if keyword.search_volume %}
+                            {{ keyword.search_volume }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if keyword.difficulty %}
+                            <span class="badge bg-{{ 'danger' if keyword.difficulty > 70 else 'warning' if keyword.difficulty > 40 else 'success' }}">
+                                {{ keyword.difficulty }}
+                            </span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if keyword.current_rank %}
+                            {{ keyword.current_rank }}
+                            {% if keyword.rank_changed > 0 %}
+                            <span class="text-success"><i class="bi bi-arrow-up"></i>{{ keyword.rank_changed }}</span>
+                            {% elif keyword.rank_changed < 0 %}
+                            <span class="text-danger"><i class="bi bi-arrow-down"></i>{{ -keyword.rank_changed }}</span>
+                            {% endif %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if keyword.status == 'active' else 'secondary' }}">
+                                {{ keyword.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <form method="POST" action="{{ url_for('seo.delete_keyword', keyword_id=keyword.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('确定要删除这个关键词吗?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if pagination.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('seo.keywords', page=pagination.prev_num) }}">上一页</a>
+                </li>
+                {% endif %}
+
+                {% for p in range(1, pagination.pages + 1) %}
+                <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                    <a class="page-link" href="{{ url_for('seo.keywords', page=p) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('seo.keywords', page=pagination.next_num) }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <div class="text-muted mb-3">
+                <i class="bi bi-key fs-1"></i>
+            </div>
+            <h5>暂无关键词</h5>
+            <p class="text-muted">添加关键词开始追踪</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 添加关键词Modal -->
+<div class="modal fade" id="addKeywordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加关键词</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('seo.add_keyword') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="keyword" class="form-label">关键词</label>
+                        <input type="text" class="form-control" id="keyword" name="keyword" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_id" class="form-label">关联站点</label>
+                        <select class="form-select" id="site_id" name="site_id">
+                            <option value="">不关联</option>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}">{{ site.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
