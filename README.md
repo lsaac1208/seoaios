@@ -1,3 +1,5 @@
+[English](./README.md) | [中文](./README_ZH.md)
+
 # SEO AIOS - Automated SEO Content Factory
 
 <p align="center">
