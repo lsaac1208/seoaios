@@ -21,25 +21,37 @@ csrf = CSRFProtect()
 
 def setup_logging(app: Flask):
     """配置日志"""
-    if not app.debug:
-        # 创建日志目录
-        log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-        os.makedirs(log_dir, exist_ok=True)
+    # 创建日志目录
+    log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+    os.makedirs(log_dir, exist_ok=True)
 
-        # 文件日志
-        file_handler = RotatingFileHandler(
-            os.path.join(log_dir, 'seoaios.log'),
-            maxBytes=10 * 1024 * 1024,  # 10MB
-            backupCount=10
-        )
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        app.logger.addHandler(file_handler)
+    # 获取日志文件路径
+    log_file = app.config.get('LOG_FILE', 'seoaios.log')
+    if not log_file.startswith('/'):
+        log_file = os.path.join(log_dir, log_file)
 
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('SEO AIOS startup')
+    # 文件日志 - 始终启用
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=10 * 1024 * 1024,  # 10MB
+        backupCount=10
+    )
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    app.logger.addHandler(file_handler)
+
+    # 控制台日志
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG if app.debug else logging.INFO)
+    console_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s'
+    ))
+    app.logger.addHandler(console_handler)
+
+    app.logger.setLevel(logging.DEBUG if app.debug else logging.INFO)
+    app.logger.info('SEO AIOS startup')
 
 
 def create_app(config_name: str = 'development') -> Flask:
