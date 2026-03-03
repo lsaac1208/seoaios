@@ -102,6 +102,8 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             {% if current_user.is_admin %}
                             <li><a class="dropdown-item" href="{{ url_for('admin.index') }}">管理后台</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.ai_settings') }}">AI 配置</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.admin_settings') }}">系统设置</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">个人资料</a></li>

@@ -338,6 +338,43 @@ def admin_settings():
     return render_template('admin/settings.html', settings=settings_dict)
 
 
+@admin_bp.route('/ai-settings', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def ai_settings():
+    """AI配置"""
+    if request.method == 'POST':
+        # 保存AI设置
+        ai_settings_keys = [
+            'openai_api_key', 'openai_api_base', 'openai_model',
+            'anthropic_api_key', 'anthropic_model',
+            'deepseek_api_key', 'deepseek_model',
+            'minimax_api_key', 'minimax_group_id', 'minimax_model',
+            'gemini_api_key', 'gemini_model',
+            'azure_api_key', 'azure_api_base', 'azure_deployment',
+            'default_provider', 'temperature', 'default_article_length'
+        ]
+
+        for key in ai_settings_keys:
+            value = request.form.get(key, '').strip()
+            setting = Setting.query.filter_by(key=key).first()
+            if setting:
+                setting.value = value
+            else:
+                setting = Setting(key=key, value=value)
+                db.session.add(setting)
+
+        db.session.commit()
+        flash('AI配置已保存', 'success')
+        return redirect(url_for('admin.ai_settings'))
+
+    # 获取所有AI设置
+    all_settings = Setting.query.all()
+    settings = {s.key: s.value for s in all_settings}
+
+    return render_template('admin/ai_settings.html', settings=settings)
+
+
 @admin_bp.route('/system-info')
 @login_required
 @admin_required
