@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}任务管理 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>任务管理</h2>
+            <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">返回后台</a>
+        </div>
+
+        <!-- 筛选 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" class="row">
+                    <div class="col-md-6">
+                        <select name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="">全部状态</option>
+                            <option value="pending" {% if status == 'pending' %}selected{% endif %}>等待中</option>
+                            <option value="running" {% if status == 'running' %}selected{% endif %}>运行中</option>
+                            <option value="completed" {% if status == 'completed' %}selected{% endif %}>已完成</option>
+                            <option value="failed" {% if status == 'failed' %}selected{% endif %}>失败</option>
+                            <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>已取消</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>任务名称</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>进度</th>
+                            <th>用户</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.id }}</td>
+                            <td>{{ task.name }}</td>
+                            <td>
+                                {% if task.task_type == 'generate' %}
+                                <span class="badge bg-primary">生成</span>
+                                {% elif task.task_type == 'crawl' %}
+                                <span class="badge bg-info">爬取</span>
+                                {% elif task.task_type == 'publish' %}
+                                <span class="badge bg-success">发布</span>
+                                {% elif task.task_type == 'analyze' %}
+                                <span class="badge bg-warning">分析</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ task.task_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.status == 'pending' %}
+                                <span class="badge bg-secondary">等待中</span>
+                                {% elif task.status == 'running' %}
+                                <span class="badge bg-primary">运行中</span>
+                                {% elif task.status == 'completed' %}
+                                <span class="badge bg-success">已完成</span>
+                                {% elif task.status == 'failed' %}
+                                <span class="badge bg-danger">失败</span>
+                                {% elif task.status == 'cancelled' %}
+                                <span class="badge bg-warning">已取消</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.total %}
+                                {{ task.progress }}/{{ task.total }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.user %}
+                                <a href="{{ url_for('admin.user_detail', user_id=task.user.id) }}">{{ task.user.username }}</a>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if task.status in ['pending', 'running'] %}
+                                <form method="POST" action="{{ url_for('admin.task_cancel', task_id=task.id) }}" style="display:inline;" onsubmit="return confirm('确定取消该任务？');">
+                                    <button type="submit" class="btn btn-sm btn-warning">取消</button>
+                                </form>
+                                {% endif %}
+                                {% if task.status == 'failed' and task.error_message %}
+                                <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#errorModal{{ task.id }}">错误信息</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if task.error_message %}
+                        <div class="modal fade" id="errorModal{{ task.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">错误信息</h5>
+                                        <button type="button" class="btn-close" data-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <pre>{{ task.error_message }}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">暂无任务</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- 分页 -->
+                {% if pagination.pages > 1 %}
+                <nav>
+                    <ul class="pagination">
+                        {% if pagination.has_prev %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin.tasks', page=pagination.prev_num, status=status) }}">上一页</a></li>
+                        {% endif %}
+                        {% for p in range(1, pagination.pages + 1) %}
+                        <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('admin.tasks', page=p, status=status) }}">{{ p }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if pagination.has_next %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin.tasks', page=pagination.next_num, status=status) }}">下一页</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

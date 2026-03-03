@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}编辑用户 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>编辑用户</h2>
+            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-secondary">返回详情</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">用户名</label>
+                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                        <small class="text-muted">用户名不可修改</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">昵称</label>
+                        <input type="text" name="nickname" class="form-control" value="{{ user.nickname or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if user.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">账户激活</label>
+                        </div>
+                    </div>
+
+                    {% if current_user.id != user.id %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_admin" class="form-check-input" id="is_admin" {% if user.is_admin %}checked{% endif %}>
+                            <label class="form-check-label" for="is_admin">管理员权限</label>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        当前登录账户，无法修改自己的管理员权限
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

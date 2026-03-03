@@ -107,6 +107,7 @@ def register_blueprints(app: Flask):
     from app.routes.ai import ai_bp
     from app.routes.tasks import tasks_bp
     from app.routes.api import api_bp
+    from app.routes.admin import admin_bp
 
     # 前台页面蓝图
     app.register_blueprint(main_bp)
@@ -131,6 +132,9 @@ def register_blueprints(app: Flask):
 
     # API蓝图
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    # 管理后台蓝图
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
 
 def register_template_filters(app: Flask):

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}用户详情 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>用户详情</h2>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">返回用户列表</a>
+        </div>
+
+        <div class="row">
+            <!-- 用户信息 -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">基本信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tr>
+                                <th>用户名:</th>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>邮箱:</th>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>昵称:</th>
+                                <td>{{ user.nickname or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>角色:</th>
+                                <td>
+                                    {% if user.is_admin %}
+                                    <span class="badge bg-danger">管理员</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">用户</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>状态:</th>
+                                <td>
+                                    {% if user.is_active %}
+                                    <span class="badge bg-success">正常</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">禁用</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>注册时间:</th>
+                                <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th>最后登录:</th>
+                                <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</td>
+                            </tr>
+                        </table>
+                        <a href="{{ url_for('admin.user_edit', user_id=user.id) }}" class="btn btn-warning">编辑</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计数据 -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">数据统计</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <h3>{{ stats.sites }}</h3>
+                                <small class="text-muted">站点</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h3>{{ stats.articles }}</h3>
+                                <small class="text-muted">文章</small>
+                            </div>
+                            <div class="col-6">
+                                <h3>{{ stats.keywords }}</h3>
+                                <small class="text-muted">关键词</small>
+                            </div>
+                            <div class="col-6">
+                                <h3>{{ stats.tasks }}</h3>
+                                <small class="text-muted">任务</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}管理后台 - SEO AIOS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">管理后台</h2>
+
+        <!-- 统计卡片 -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">用户总数</h5>
+                        <h2>{{ stats.total_users }}</h2>
+                        <small>本周新增: {{ stats.new_users }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">站点总数</h5>
+                        <h2>{{ stats.total_sites }}</h2>
+                        <small>本周新增: {{ stats.new_sites }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">文章总数</h5>
+                        <h2>{{ stats.total_articles }}</h2>
+                        <small>本周新增: {{ stats.new_articles }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">关键词总数</h5>
+                        <h2>{{ stats.total_keywords }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">快捷操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary">用户管理</a>
+                        <a href="{{ url_for('admin.sites') }}" class="btn btn-outline-success">站点管理</a>
+                        <a href="{{ url_for('admin.articles') }}" class="btn btn-outline-info">文章管理</a>
+                        <a href="{{ url_for('admin.tasks') }}" class="btn btn-outline-warning">任务管理</a>
+                        <a href="{{ url_for('admin.admin_settings') }}" class="btn btn-outline-secondary">系统设置</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统信息 -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">系统信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Python 版本:</strong></td>
+                                <td>{{ system_info.python_version }}</td>
+                                <td><strong>Flask 版本:</strong></td>
+                                <td>{{ system_info.flask_version }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>数据库:</strong></td>
+                                <td>{{ system_info.database }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
