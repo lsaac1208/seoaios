@@ -349,10 +349,47 @@ CONTENT:
                 return self._call_gemini(prompt, length)
             elif provider == 'azure':
                 return self._call_azure_openai(prompt, length)
+            elif provider == 'minimax':
+                return self._call_minimax(prompt, length)
             else:
                 return self._call_openai(prompt, length)
         except Exception as e:
             raise Exception(f"AI调用失败: {str(e)}")
+
+    def _call_minimax(self, prompt, length):
+        """调用 MiniMax API"""
+        api_key = getattr(self.ai_config, 'minimax_api_key', None) or os.environ.get('MINIMAX_API_KEY')
+        group_id = getattr(self.ai_config, 'minimax_group_id', None) or os.environ.get('MINIMAX_GROUP_ID')
+
+        if not api_key:
+            raise Exception("请配置 MiniMax API Key")
+
+        if not group_id:
+            raise Exception("请配置 MiniMax Group ID")
+
+        import requests
+
+        url = f"https://api.minimax.chat/v1/text/chatcompletion_v2?GroupId={group_id}"
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+
+        data = {
+            'model': 'abab6.5s-chat',
+            'messages': [
+                {'role': 'system', 'content': '你是一个专业的SEO内容写作助手，擅长生成高质量、SEO友好的文章。'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': self.ai_config.temperature or 0.7,
+            'max_tokens': min(length * 2, 4000)
+        }
+
+        response = requests.post(url, headers=headers, json=data, timeout=120)
+        response.raise_for_status()
+
+        result = response.json()
+        return result['choices'][0]['message']['content']
 
     def _call_deepseek(self, prompt, length):
         """调用 DeepSeek API"""

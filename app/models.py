@@ -430,6 +430,11 @@ class AiConfig(db.Model):
     gemini_api_key = db.Column(db.String(255))
     gemini_model = db.Column(db.String(50), default='gemini-pro')
 
+    # MiniMax配置
+    minimax_api_key = db.Column(db.String(255))
+    minimax_group_id = db.Column(db.String(255))
+    minimax_model = db.Column(db.String(50), default='abab6.5s-chat')
+
     # Azure OpenAI配置
     azure_api_key = db.Column(db.String(255))
     azure_api_base = db.Column(db.String(255))
@@ -473,6 +478,7 @@ class AiConfig(db.Model):
             {'id': 'anthropic', 'name': 'Anthropic Claude', 'models': ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-haiku-20240307']},
             {'id': 'deepseek', 'name': 'DeepSeek', 'models': ['deepseek-chat', 'deepseek-coder']},
             {'id': 'gemini', 'name': 'Google Gemini', 'models': ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro']},
+            {'id': 'minimax', 'name': 'MiniMax', 'models': ['abab6.5s-chat', 'abab6-chat']},
             {'id': 'azure', 'name': 'Azure OpenAI', 'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-35-turbo']},
             {'id': 'custom', 'name': '自定义API', 'models': []},
         ]
