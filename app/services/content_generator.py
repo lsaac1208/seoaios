@@ -343,10 +343,107 @@ CONTENT:
                 return self._call_openai(prompt, length)
             elif provider == 'anthropic':
                 return self._call_anthropic(prompt, length)
+            elif provider == 'deepseek':
+                return self._call_deepseek(prompt, length)
+            elif provider == 'gemini':
+                return self._call_gemini(prompt, length)
+            elif provider == 'azure':
+                return self._call_azure_openai(prompt, length)
             else:
                 return self._call_openai(prompt, length)
         except Exception as e:
             raise Exception(f"AI调用失败: {str(e)}")
+
+    def _call_deepseek(self, prompt, length):
+        """调用 DeepSeek API"""
+        api_key = getattr(self.ai_config, 'deepseek_api_key', None) or os.environ.get('DEEPSEEK_API_KEY')
+
+        if not api_key:
+            raise Exception("请配置 DeepSeek API Key")
+
+        import requests
+
+        url = "https://api.deepseek.com/v1/chat/completions"
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+
+        data = {
+            'model': 'deepseek-chat',
+            'messages': [
+                {'role': 'system', 'content': '你是一个专业的SEO内容写作助手，擅长生成高质量、SEO友好的文章。'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': self.ai_config.temperature or 0.7,
+            'max_tokens': min(length * 2, 4000)
+        }
+
+        response = requests.post(url, headers=headers, json=data, timeout=120)
+        response.raise_for_status()
+
+        result = response.json()
+        return result['choices'][0]['message']['content']
+
+    def _call_gemini(self, prompt, length):
+        """调用 Google Gemini API"""
+        api_key = getattr(self.ai_config, 'gemini_api_key', None) or os.environ.get('GEMINI_API_KEY')
+
+        if not api_key:
+            raise Exception("请配置 Gemini API Key")
+
+        import requests
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+
+        data = {
+            'contents': [{
+                'parts': [{'text': prompt}]
+            }],
+            'generationConfig': {
+                'temperature': self.ai_config.temperature or 0.7,
+                'maxOutputTokens': min(length * 2, 4000)
+            }
+        }
+
+        response = requests.post(url, json=data, timeout=120)
+        response.raise_for_status()
+
+        result = response.json()
+        return result['candidates'][0]['content']['parts'][0]['text']
+
+    def _call_azure_openai(self, prompt, length):
+        """调用 Azure OpenAI API"""
+        api_key = getattr(self.ai_config, 'azure_api_key', None) or os.environ.get('AZURE_OPENAI_API_KEY')
+        api_base = getattr(self.ai_config, 'azure_api_base', None) or os.environ.get('AZURE_OPENAI_API_BASE')
+        deployment = getattr(self.ai_config, 'azure_deployment', None) or os.environ.get('AZURE_OPENAI_DEPLOYMENT', 'gpt-35-turbo')
+
+        if not api_key or not api_base:
+            raise Exception("请配置 Azure OpenAI API Key 和 Base")
+
+        import requests
+
+        url = f"{api_base}/openai/deployments/{deployment}/chat/completions?api-version=2024-02-01"
+
+        headers = {
+            'api-key': api_key,
+            'Content-Type': 'application/json'
+        }
+
+        data = {
+            'messages': [
+                {'role': 'system', 'content': '你是一个专业的SEO内容写作助手，擅长生成高质量、SEO友好的文章。'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': self.ai_config.temperature or 0.7,
+            'max_tokens': min(length * 2, 4000)
+        }
+
+        response = requests.post(url, headers=headers, json=data, timeout=120)
+        response.raise_for_status()
+
+        result = response.json()
+        return result['choices'][0]['message']['content']
 
     def _call_openai(self, prompt, length):
         """调用OpenAI API"""

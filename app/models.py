@@ -4,6 +4,7 @@ Automated SEO Content Factory - Database Models
 """
 
 from datetime import datetime
+from typing import List
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db
@@ -410,7 +411,7 @@ class AiConfig(db.Model):
     site_id = db.Column(db.Integer, db.ForeignKey('sites.id'), nullable=False, index=True, unique=True)
 
     # Provider配置
-    provider = db.Column(db.String(50), default='openai')  # openai, anthropic, custom
+    provider = db.Column(db.String(50), default='openai')  # openai, anthropic, deepseek, gemini, azure, custom
 
     # OpenAI配置
     openai_api_key = db.Column(db.String(255))
@@ -420,6 +421,20 @@ class AiConfig(db.Model):
     # Anthropic配置
     anthropic_api_key = db.Column(db.String(255))
     anthropic_model = db.Column(db.String(50), default='claude-3-haiku-20240307')
+
+    # DeepSeek配置
+    deepseek_api_key = db.Column(db.String(255))
+    deepseek_model = db.Column(db.String(50), default='deepseek-chat')
+
+    # Gemini配置
+    gemini_api_key = db.Column(db.String(255))
+    gemini_model = db.Column(db.String(50), default='gemini-pro')
+
+    # Azure OpenAI配置
+    azure_api_key = db.Column(db.String(255))
+    azure_api_base = db.Column(db.String(255))
+    azure_deployment = db.Column(db.String(50))
+    azure_api_version = db.Column(db.String(50), default='2024-02-01')
 
     # 自定义API配置
     custom_api_key = db.Column(db.String(255))
@@ -432,6 +447,7 @@ class AiConfig(db.Model):
     default_description_length = db.Column(db.Integer, default=160)
     temperature = db.Column(db.Float, default=0.7)
     top_p = db.Column(db.Float, default=1.0)
+    max_tokens = db.Column(db.Integer, default=4000)
 
     # 改写配置
     rewrite_style = db.Column(db.String(50), default='semantic')  # semantic, paraphrasing, humanize
@@ -441,8 +457,26 @@ class AiConfig(db.Model):
     generation_prompt = db.Column(db.Text)
     rewrite_prompt = db.Column(db.Text)
 
+    # 高级配置
+    enable_cache = db.Column(db.Boolean, default=True)
+    cache_ttl = db.Column(db.Integer, default=3600)  # 缓存时间（秒）
+    enable_streaming = db.Column(db.Boolean, default=False)  # 流式输出
+    fallback_provider = db.Column(db.String(50))  # 备用提供商
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def get_available_providers(self) -> List[dict]:
+        """获取可用的AI提供商列表"""
+        providers = [
+            {'id': 'openai', 'name': 'OpenAI', 'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo']},
+            {'id': 'anthropic', 'name': 'Anthropic Claude', 'models': ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-haiku-20240307']},
+            {'id': 'deepseek', 'name': 'DeepSeek', 'models': ['deepseek-chat', 'deepseek-coder']},
+            {'id': 'gemini', 'name': 'Google Gemini', 'models': ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro']},
+            {'id': 'azure', 'name': 'Azure OpenAI', 'models': ['gpt-4o', 'gpt-4-turbo', 'gpt-35-turbo']},
+            {'id': 'custom', 'name': '自定义API', 'models': []},
+        ]
+        return providers
 
     def __repr__(self):
         return f'<AiConfig {self.id}>'
